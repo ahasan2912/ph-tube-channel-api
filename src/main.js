@@ -9,47 +9,118 @@ const loadCatagories = async () => {
     catch (error) {
         console.log("Catch Error");
     }
-}
+};
 
 const loadVideos = async () => {
-    const res = await fetch('https://openapi.programming-hero.com/api/phero-tube/videos');
-    const data = await res.json();
-    displayVideos(data.videos);
+    try {
+        const res = await fetch('https://openapi.programming-hero.com/api/phero-tube/videos');
+        const data = await res.json();
+        displayVideos(data.videos);
+    }
+    catch (error) {
+        console.log("Catch Error");
+    }
+};
 
-}
+const loadCatagoryVideo = async (id) => {
+    try {
+        const res = await fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`);
+        const data = await res.json();
+        displayVideos(data.category);
+    }
+    catch (error) {
+        console.log("Catch Error");
+    }
+};
+
 // create DisplayCategories
 const displayCategories = (categories) => {
     const categoriesContainer = document.getElementById('categories');
     categories.forEach((item) => {
-        const button = document.createElement('button');
-        button.classList.add("btn")
-        button.innerText = item.category;
-        categoriesContainer.appendChild(button);
+        const div = document.createElement('div');
+        div.innerHTML = `
+            <button onclick = "loadCatagoryVideo(${item.category_id})" class ="btn">${item.category}</button>
+        `;
+        categoriesContainer.appendChild(div);
     });
-}
-
+};
 // create DisplayVideos
 const displayVideos = (videos) => {
     const videoContainer = document.getElementById('videos');
+    videoContainer.innerHTML = "";
+
+    if(videos.length === 0){
+        videoContainer.classList.remove("grid");
+        videoContainer.innerHTML = `
+        <div class = "min-h-[300px] w-full flex flex-col gap-5 justify-center items-center">
+            <img src = "/src/image/Icon.png">
+            <h2 class = "text-center text-2xl font-bold">No Content in this Category</h2>
+        </div>
+        `
+    }
+    else{
+        videoContainer.classList.add("grid");
+    }
+
     videos.forEach((item) => {
         const card = document.createElement('div');
         card.classList = ("card card-compact bg-base-100");
         card.innerHTML = `
-       <figure>
-            <img
+       <figure class = "h-[200px] relative">
+            <img class = "h-full w-full object-cover"
             src=${item.thumbnail}
             alt="Shoes" />
+            ${item.others?.posted_date?.length === 0 ? "" : `<span class = "absolute right-2 bottom-2 bg-gray-300 text-black font-semibold p-1 rounded-md">${getTimeSting(item.others?.posted_date)}</span>`
+            }
         </figure>
-        <div class="card-body">
-            <h2 class="card-title">Shoes!</h2>
-            <p>If a dog chews shoes whose shoes does he choose?</p>
-            <div class="card-actions justify-end">
-                <button class="btn btn-primary">Buy Now</button>
+        <div class="px-0 py-2 flex gap-2">
+            <div>
+                <img class="w-10 h-10 rounded-full object-cover" src= ${item.authors[0].profile_picture}>
+            </div>
+            <div>
+                <h2 class ="font-bold">${item.title}</h2>
+                <div class ="flex items-center space-x-1">
+                    <p class = "text-gray-500 font-semibold">${item.authors[0].profile_name}</p>
+                    ${item.authors[0].verified === true ? `<img class="w-4 h-4 rounded-full object-cover" src = "https://img.icons8.com/?size=96&id=98A4yZTt9abw&format=png">` : ''}
+                </div>
+                <p class="text-gray-400 text-sm">${item.others.views}</p>
             </div>
         </div>
        `;
         videoContainer.appendChild(card);
     });
-}
+};
+function getTimeSting(time) {
+    let year = parseInt(time / (86400 * 30 * 12));
+    let remainMonth = time % (86400 * 30 * 12);
+    let month = parseInt(remainMonth / (86400 * 30));
+    let remaingDay = remainMonth % (86400 * 30);
+    let day = parseInt(remaingDay / 86400);
+    let remainghour = (remaingDay % 86400);
+    let hour = parseInt(remainghour / 3600);
+    let remaingminute = remainghour % 3600;
+    let minute = parseInt(remaingminute / 60);
+    let remaingSecond = remaingminute % 60;
+
+    if (year > 0) {
+        return `${year}Yr ${month}month ${day}day ${hour}hrs ${minute}min ${remaingSecond}sec ago`;
+    }
+    else if (year === 0 && month > 0) {
+        return `${month}month ${day}day ${hour}hrs ${minute}min ${remaingSecond}sec ago`;
+    }
+    else if (month === 0 && day > 0) {
+        return `${day}day ${hour}hrs ${minute}min ${remaingSecond}sec ago`;
+    }
+    else if (day === 0 && hour > 0) {
+        return `${hour}hrs ${minute}min ${remaingSecond}sec ago`;
+    }
+    else if (hour === 0 && minute > 0) {
+        return `${minute}min ${remaingSecond}sec ago`
+    }
+    else {
+        return `${remaingSecond}sec ago`;
+    }
+
+};
 loadCatagories();
 loadVideos();
