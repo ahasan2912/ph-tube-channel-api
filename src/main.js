@@ -48,7 +48,6 @@ const vedioDetails = async (videoId) =>{
     }
     
 }
-
 const vedioDisplayDetails = async (video) =>{
     const modalContent = document.getElementById('modal-content');
     modalContent.innerHTML = `
@@ -82,7 +81,7 @@ const displayVideos = (videos) => {
         videoContainer.classList.remove("grid");
         videoContainer.innerHTML = `
         <div class = "min-h-[300px] w-full flex flex-col gap-5 justify-center items-center">
-            <img src = "/src/image/Icon.png">
+            <img src = "../src/image/Icon.png">
             <h2 class = "text-center text-2xl font-bold">No Content in this Category</h2>
         </div>
         `
@@ -163,6 +162,10 @@ const removeActiveClass = () =>{
 }
 document.getElementById('search-input').addEventListener("keyup", (event)=>{
     loadVideos(event.target.value);
-})
+});
+
+const sortVideos = (video) =>{
+    console.log(video);
+}
 loadCatagories();
 loadVideos();
