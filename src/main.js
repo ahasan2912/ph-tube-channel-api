@@ -11,9 +11,9 @@ const loadCatagories = async () => {
     }
 };
 
-const loadVideos = async () => {
+const loadVideos = async (searchText = "") => {
     try {
-        const res = await fetch('https://openapi.programming-hero.com/api/phero-tube/videos');
+        const res = await fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`);
         const data = await res.json();
         displayVideos(data.videos);
     }
@@ -26,6 +26,10 @@ const loadCatagoryVideo = async (id) => {
     try {
         const res = await fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`);
         const data = await res.json();
+
+        removeActiveClass();
+        const activeBtn =document.getElementById(`btn-${id}`);
+        activeBtn.classList.add('active');
         displayVideos(data.category);
     }
     catch (error) {
@@ -33,13 +37,38 @@ const loadCatagoryVideo = async (id) => {
     }
 };
 
+const vedioDetails = async (videoId) =>{
+    try {
+        const res = await fetch(`https://openapi.programming-hero.com/api/phero-tube/video/${videoId}`);
+        const data = await res.json();
+        vedioDisplayDetails(data.video);
+    }
+    catch (error) {
+        console.log("Catch Error");
+    }
+    
+}
+
+const vedioDisplayDetails = async (video) =>{
+    const modalContent = document.getElementById('modal-content');
+    modalContent.innerHTML = `
+    <img src = ${video.thumbnail}>
+    <p class="">${video.description}</p>
+    `
+    //way1
+    // document.getElementById('showModalData').click();
+    //way2
+    document.getElementById('customModel').showModal();
+
+}
+
 // create DisplayCategories
 const displayCategories = (categories) => {
     const categoriesContainer = document.getElementById('categories');
     categories.forEach((item) => {
         const div = document.createElement('div');
         div.innerHTML = `
-            <button onclick = "loadCatagoryVideo(${item.category_id})" class ="btn">${item.category}</button>
+            <button id = "btn-${item.category_id}" onclick = "loadCatagoryVideo(${item.category_id})" class ="btn category-btn">${item.category}</button>
         `;
         categoriesContainer.appendChild(div);
     });
@@ -84,6 +113,9 @@ const displayVideos = (videos) => {
                     ${item.authors[0].verified === true ? `<img class="w-4 h-4 rounded-full object-cover" src = "https://img.icons8.com/?size=96&id=98A4yZTt9abw&format=png">` : ''}
                 </div>
                 <p class="text-gray-400 text-sm">${item.others.views}</p>
+                <p>
+                    <button onclick = "vedioDetails('${item.video_id}')" class = "btn btn-error">details</button>
+                </p>
             </div>
         </div>
        `;
@@ -122,5 +154,15 @@ function getTimeSting(time) {
     }
 
 };
+
+const removeActiveClass = () =>{
+    const button = document.getElementsByClassName('category-btn');
+    for(let btn of button){
+        btn.classList.remove('active');
+    }
+}
+document.getElementById('search-input').addEventListener("keyup", (event)=>{
+    loadVideos(event.target.value);
+})
 loadCatagories();
 loadVideos();
