@@ -28,7 +28,7 @@ const loadCatagoryVideo = async (id) => {
         const data = await res.json();
 
         removeActiveClass();
-        const activeBtn =document.getElementById(`btn-${id}`);
+        const activeBtn = document.getElementById(`btn-${id}`);
         activeBtn.classList.add('active');
         displayVideos(data.category);
     }
@@ -37,7 +37,7 @@ const loadCatagoryVideo = async (id) => {
     }
 };
 
-const vedioDetails = async (videoId) =>{
+const vedioDetails = async (videoId) => {
     try {
         const res = await fetch(`https://openapi.programming-hero.com/api/phero-tube/video/${videoId}`);
         const data = await res.json();
@@ -46,9 +46,9 @@ const vedioDetails = async (videoId) =>{
     catch (error) {
         console.log("Catch Error");
     }
-    
+
 }
-const vedioDisplayDetails = async (video) =>{
+const vedioDisplayDetails = async (video) => {
     const modalContent = document.getElementById('modal-content');
     modalContent.innerHTML = `
     <img src = ${video.thumbnail}>
@@ -74,10 +74,19 @@ const displayCategories = (categories) => {
 };
 // create DisplayVideos
 const displayVideos = (videos) => {
+    //Sorting the views
+    document.getElementById('sort').addEventListener('click', () => {
+        const sorting = videos.sort((a, b) => {
+            const viewsA = parseInt(a.others.views.slice(0, a.others.views.length - 1));
+            const viewsB = parseInt(b.others.views.slice(0, a.others.views.length - 1));
+            return viewsB - viewsA
+        });
+        displayVideos(sorting);
+    });
     const videoContainer = document.getElementById('videos');
     videoContainer.innerHTML = "";
 
-    if(videos.length === 0){
+    if (videos.length === 0) {
         videoContainer.classList.remove("grid");
         videoContainer.innerHTML = `
         <div class = "min-h-[300px] w-full flex flex-col gap-5 justify-center items-center">
@@ -86,7 +95,7 @@ const displayVideos = (videos) => {
         </div>
         `
     }
-    else{
+    else {
         videoContainer.classList.add("grid");
     }
 
@@ -154,17 +163,17 @@ function getTimeSting(time) {
 
 };
 
-const removeActiveClass = () =>{
+const removeActiveClass = () => {
     const button = document.getElementsByClassName('category-btn');
-    for(let btn of button){
+    for (let btn of button) {
         btn.classList.remove('active');
     }
 }
-document.getElementById('search-input').addEventListener("keyup", (event)=>{
+document.getElementById('search-input').addEventListener("keyup", (event) => {
     loadVideos(event.target.value);
 });
 
-const sortVideos = (video) =>{
+const sortVideos = (video) => {
     console.log(video);
 }
 loadCatagories();
